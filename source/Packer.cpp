@@ -102,8 +102,10 @@ void Packer::extract(const std::string &inputFileName)
 		if(!file.is_open())
 		{
 			std::cout << "Can't create " << fileName << "file " << std::endl;
+			input.seekg(fileSize, std::ios::cur);
+			return;
 		}
-		
+
 		for(unsigned int i = 0; i < fileSize; ++i)
 		{
 			input.read((byte*)&tmp, sizeof(byte));
