@@ -99,6 +99,11 @@ void Packer::extract(const std::string &inputFileName)
 		input.read((byte*)&fileSize, sizeof(size_t));
 
 		std::ofstream file(fileName, std::ios::binary);
+		if(!file.is_open())
+		{
+			std::cout << "Can't create " << fileName << "file " << std::endl;
+		}
+		
 		for(unsigned int i = 0; i < fileSize; ++i)
 		{
 			input.read((byte*)&tmp, sizeof(byte));
