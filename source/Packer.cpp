@@ -69,6 +69,7 @@ void Packer::pack(const std::string &outputFileName, const std::vector<std::stri
 		std::cout << "--File '" << currentFile << "' was packed" << std::endl;
 	}
 	output.close();
+	std::cout << "--Done" << std::endl;
 }
 
 void Packer::extract(const std::string &inputFileName)
@@ -84,7 +85,7 @@ void Packer::extract(const std::string &inputFileName)
 	{
 		size_t fileNameSize;
 		if(!input.read((byte*)&fileNameSize, sizeof(size_t)))
-			break;
+			break; // loop exit
 
 		char tmp;
 		std::string fileName;
@@ -106,9 +107,38 @@ void Packer::extract(const std::string &inputFileName)
 		std::cout << "--File '" << fileName << "' was extracted" << std::endl;
 	}
 	input.close();
+	std::cout << "--Done" << std::endl;
 }
 
 void Packer::inside(const std::string &inputFileName)
 {
+	std::ifstream input(inputFileName, std::ios::binary);
+	if(!input.is_open())
+	{
+		std::cout << "~Error. File '" << inputFileName << "' not found" << std::endl;
+		return;
+	}
 
+	while(true)
+	{
+		size_t fileNameSize;
+		if(!input.read((byte*)&fileNameSize, sizeof(size_t)))
+			break; //loop exit
+
+		char buffer;
+		std::string fileName;
+		for(unsigned int i = 0; i < fileNameSize; ++i)
+		{
+			input.read((byte*)&buffer, sizeof(char));
+			fileName += buffer;
+		}
+
+		size_t fileSize;
+		input.read((byte*)&fileSize, sizeof(size_t));
+		input.seekg(fileSize, std::ios::cur);
+
+		std::cout << "'" << fileName << "' (" << fileSize << "b)" << std::endl;
+	}	
+	input.close();
+	std::cout << "--Done" << std::endl;
 }
