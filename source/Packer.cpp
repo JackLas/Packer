@@ -16,8 +16,6 @@ void Packer::run(const InputData &data)
 		extract(data.mainArgument);
 	else if(data.command == "-inside")
 		inside(data.mainArgument);
-	else if(data.command == "-extend")
-		extend(data.mainArgument, data.subArguments);
 	else std::cout << "Command " << data.command << " not found " << std::endl;
 }
 
@@ -73,17 +71,44 @@ void Packer::pack(const std::string &outputFileName, const std::vector<std::stri
 	output.close();
 }
 
-void Packer::extract(const std::string &filename)
+void Packer::extract(const std::string &inputFileName)
 {
+	std::ifstream input(inputFileName, std::ios::binary);
+	if(!input.is_open())
+	{
+		std::cout << "~Error. File " << inputFileName << "not found" << std::endl;
+		return; 
+	}
 
+	while(true)
+	{
+		size_t fileNameSize;
+		if(!input.read((byte*)&fileNameSize, sizeof(size_t)))
+			break;
+
+		char tmp;
+		std::string fileName;
+		for(unsigned int i = 0; i < fileNameSize; ++i)
+		{
+			input.read((byte*)&tmp, sizeof(byte));
+			fileName += tmp;
+		}
+
+		size_t fileSize;
+		input.read((byte*)&fileSize, sizeof(size_t));
+
+		std::ofstream file(fileName, std::ios::binary);
+		for(unsigned int i = 0; i < fileSize; ++i)
+		{
+			input.read((byte*)&tmp, sizeof(byte));
+			file.write((byte*)&tmp, sizeof(byte));
+		}
+		std::cout << "--File '" << fileName << "' was extracted" << std::endl;
+	}
+	input.close();
 }
 
-void Packer::inside(const std::string &filename)
-{
-
-}
-
-void Packer::extend(const std::string &filename, const std::vector<std::string> &files)
+void Packer::inside(const std::string &inputFileName)
 {
 
 }
